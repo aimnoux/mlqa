@@ -89,10 +89,10 @@ function renderTopics() {
 function questionHtml(q: Question) {
   const open = openIds.has(q.id);
   const n = q.followUps.length;
-  const count = `<span class="q-count${q.asked > 1 ? ' hot' : ''}" title="Встречался на ${q.asked} ${plural(q.asked, 'собеседовании', 'собеседованиях', 'собеседованиях')}">${q.asked}×</span>`;
+  const count = `<span class="q-count lvl-${Math.min(q.asked, 3)}" title="Встречался на ${q.asked} ${plural(q.asked, 'собеседовании', 'собеседованиях', 'собеседованиях')}">${q.asked}×</span>`;
   const meta = `
     <span class="q-meta">
-      <span>${TOPIC_LABEL[q.topic]}</span>
+      <span class="q-tag">${TOPIC_LABEL[q.topic]}</span>
       ${n ? `<span class="q-toggle">${ICON_CHEVRON}${n} ${plural(n, 'уточнение', 'уточнения', 'уточнений')}</span>` : ''}
       <a class="q-link" href="?id=${q.id}" data-link="${q.id}">#${q.id}</a>
     </span>`;
@@ -111,6 +111,9 @@ function questionHtml(q: Question) {
 
 function renderList() {
   const filtered = sorted.filter(matches);
+  const n = filtered.length;
+  document.getElementById('caption')!.textContent =
+    `${n} ${plural(n, 'вопрос', 'вопроса', 'вопросов')} · сначала самые частые`;
   document.getElementById('list')!.innerHTML = filtered.length
     ? filtered.map(questionHtml).join('')
     : `<p class="empty">Ничего не найдено</p>`;
@@ -172,6 +175,7 @@ function init() {
           <button class="theme-btn" id="theme-btn"></button>
         </div>
         <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input id="search" type="search" placeholder="Поиск по вопросам и уточнениям" autocomplete="off" spellcheck="false" />
           <kbd>/</kbd>
         </div>
@@ -181,10 +185,7 @@ function init() {
     <div class="wrap layout">
       <nav class="topics" id="topics" aria-label="Темы"></nav>
       <main>
-        <div class="list-head">
-          <span class="list-head-count">Раз</span>
-          <span class="list-head-q">Вопрос</span>
-        </div>
+        <p class="caption" id="caption"></p>
         <div id="list"></div>
       </main>
     </div>
