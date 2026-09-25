@@ -32,6 +32,15 @@ function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// Экранирует текст и превращает фрагменты ```…``` в блоки кода
+function richText(s: string) {
+  return s.split('```').map((part, i) => {
+    if (i % 2 === 0) return esc(part);
+    const code = part.replace(/^[\w+-]*\n/, '').replace(/^\n+|\n+$/g, '');
+    return `<code class="q-code">${esc(code)}</code>`;
+  }).join('');
+}
+
 function plural(n: number, one: string, few: string, many: string) {
   const mod10 = n % 10;
   const mod100 = n % 100;
@@ -98,14 +107,14 @@ function questionHtml(q: Question) {
       ${n ? `<span class="q-toggle">${ICON_CHEVRON}${n} ${plural(n, 'уточнение', 'уточнения', 'уточнений')}</span>` : ''}
       <a class="q-link" href="?id=${q.id}" data-link="${q.id}">#${q.id}</a>
     </span>`;
-  const body = `<span class="q-body"><span class="q-text">${esc(q.question)}</span>${meta}</span>`;
+  const body = `<span class="q-body"><span class="q-text">${richText(q.question)}</span>${meta}</span>`;
 
   // Вопрос без уточнений раскрывать нечего — это просто строка
   const row = n
     ? `<div class="q-row" role="button" tabindex="0" data-toggle="${q.id}" aria-expanded="${open}">${count}${body}</div>`
     : `<div class="q-row">${count}${body}</div>`;
   const followUps = n
-    ? `<ol class="q-followups"${open ? '' : ' hidden'}>${q.followUps.map((f) => `<li>${esc(f)}</li>`).join('')}</ol>`
+    ? `<ol class="q-followups"${open ? '' : ' hidden'}>${q.followUps.map((f) => `<li>${richText(f)}</li>`).join('')}</ol>`
     : '';
 
   return `<article class="q${open ? ' open' : ''}" id="q-${q.id}">${row}${followUps}</article>`;
@@ -170,7 +179,7 @@ function init() {
           <div>
             <h1 class="title">ML Interview Questions</h1>
             <p class="subtitle">
-              ${questions.length} ${plural(questions.length, 'вопрос', 'вопроса', 'вопросов')} с ${interviewsCount} реальных собеседований на Data Scientist и ML-инженера: классический ML, NLP, LLM, статистика, алгоритмы и System Design.
+              ${questions.length} ${plural(questions.length, 'вопрос', 'вопроса', 'вопросов')} с ${interviewsCount} ${plural(interviewsCount, 'реального собеседования', 'реальных собеседований', 'реальных собеседований')} на Data Scientist и ML-инженера: классический ML, NLP, LLM, статистика, алгоритмы и System Design.
               Собирает <a href="https://t.me/maxouniai" target="_blank" rel="noopener">@maxouniai</a>
             </p>
           </div>
