@@ -1,10 +1,10 @@
 # Запись об одном обработанном собеседовании.
 # Файл: content/interviews/<YYYY>/<id>.yaml. Сырые материалы (видео, аудио, транскрипт) в репозиторий НЕ кладутся.
+# Название компании не хранится — ни здесь, ни где-либо ещё в репозитории.
 
 # id = имя файла: <дата>-<роль>-<грейд>[-<n>]
 id: 2026-09-20-llm-middle
 date: 2026-09-20          # дата собеседования; если неизвестна — дата обработки
-company: null             # название компании или null, если скрываем
 role: llm                 # data-scientist | ml-engineer | ai-engineer | nlp | llm | recsys | cv | hft-quant | mlops | research | analyst | other
 grade: middle             # intern | junior | middle | senior | lead | unknown
 stage: tech               # screening | tech | live-coding | system-design | final | unknown
