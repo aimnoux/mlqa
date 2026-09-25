@@ -1,5 +1,8 @@
 import type { Question } from '../types';
 
+/** Из скольких собеседований собраны вопросы. */
+export const interviewsCount = 8;
+
 export const questions: Question[] = [
   {
     id: '1',

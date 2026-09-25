@@ -1,8 +1,6 @@
 import './style.css';
-import { questions } from './data/questions';
-import type { Filter, Topic } from './types';
-
-// ── Label maps ────────────────────────────────────────────
+import { interviewsCount, questions } from './data/questions';
+import type { Filter, Question, Topic } from './types';
 
 const TOPIC_LABEL: Record<Topic, string> = {
   llm: 'LLM',
@@ -21,63 +19,16 @@ const TOPIC_LABEL: Record<Topic, string> = {
   behavioral: 'Поведенческие',
 };
 
-const TOPICS: Array<Filter<Topic>> = [
-  'all', 'llm', 'ai_engineering', 'deep_learning', 'nlp', 'classic_ml', 'statistics', 'math',
-  'system_design', 'mlops', 'python', 'sql', 'algorithms', 'experience', 'behavioral',
-];
-
-// Частые вопросы — наверх; внутри одной частоты порядок из данных (по темам).
+// Частые — наверх; при равной частоте порядок из данных.
 const sorted = [...questions].sort((a, b) => b.asked - a.asked || Number(a.id) - Number(b.id));
 
-// ── SVG icons ─────────────────────────────────────────────
-
-const ICON_CHAT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/><path d="M9.5 9a2.5 2.5 0 0 1 4.86.83c0 1.67-2.5 2.5-2.5 2.5"/><path d="M11.9 15.5h.01"/></svg>`;
 const ICON_SUN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
 const ICON_MOON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
-const ICON_ARROW_UPRIGHT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>`;
-const ICON_SEND = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
-const ICON_LIST = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`;
-const ICON_MSG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-const ICON_LAYERS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`;
-
-// ── Author ────────────────────────────────────────────────
-
-const AUTHOR = {
-  name: 'Максим Огородник',
-  handle: '@maxouniai',
-  href: 'https://t.me/maxouniai',
-};
-
-// ── Escape HTML ───────────────────────────────────────────
+const ICON_CHEVRON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
 
 function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
-// ── State ─────────────────────────────────────────────────
-
-interface AppState {
-  topic: Filter<Topic>;
-  q: string;
-}
-
-let state: AppState = { topic: 'all', q: '' };
-let openQuestionId: string | null = null;
-
-// ── Theme ─────────────────────────────────────────────────
-
-function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
-
-function toggleTheme() {
-  const next = isDark() ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  document.getElementById('theme-btn')!.innerHTML = next === 'dark'
-    ? `${ICON_SUN} Светлая`
-    : `${ICON_MOON} Тёмная`;
-}
-
-// ── Plurals ───────────────────────────────────────────────
 
 function plural(n: number, one: string, few: string, many: string) {
   const mod10 = n % 10;
@@ -87,294 +38,220 @@ function plural(n: number, one: string, few: string, many: string) {
   return many;
 }
 
-// «1 уточнение», «2 уточнения», «5 уточнений»
-function pluralFollowUps(n: number) {
-  return `${n} ${plural(n, 'уточнение', 'уточнения', 'уточнений')}`;
+// ── State ─────────────────────────────────────────────────
+
+const state: { topic: Filter<Topic>; q: string } = { topic: 'all', q: '' };
+const openIds = new Set<string>();
+
+// ── Theme ─────────────────────────────────────────────────
+
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+
+function renderThemeBtn() {
+  const btn = document.getElementById('theme-btn')!;
+  btn.innerHTML = isDark() ? ICON_SUN : ICON_MOON;
+  btn.setAttribute('aria-label', isDark() ? 'Светлая тема' : 'Тёмная тема');
 }
 
-// «спрашивали 2 раза», «спрашивали 5 раз»
-function askedLabel(n: number) {
-  return `спрашивали ${n} ${plural(n, 'раз', 'раза', 'раз')}`;
+function toggleTheme() {
+  const next = isDark() ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  renderThemeBtn();
 }
 
-// ── Badge helpers ─────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────
 
-function topicBadge(topic: Topic) {
-  return `<span class="badge badge-${topic}">${TOPIC_LABEL[topic]}</span>`;
+function matches(q: Question) {
+  if (state.topic !== 'all' && q.topic !== state.topic) return false;
+  if (!state.q) return true;
+  const needle = state.q.toLowerCase();
+  return q.question.toLowerCase().includes(needle) || q.followUps.some((f) => f.toLowerCase().includes(needle));
 }
 
-function askedBadge(n: number) {
-  return n > 1 ? `<span class="badge badge-asked">${askedLabel(n)}</span>` : '';
+function renderTopics() {
+  const counts: Partial<Record<Topic, number>> = {};
+  questions.forEach((q) => { counts[q.topic] = (counts[q.topic] ?? 0) + 1; });
+
+  // Темы — по убыванию числа вопросов, пустые не показываем
+  const topics = (Object.keys(counts) as Topic[]).sort((a, b) => counts[b]! - counts[a]!);
+  const item = (value: string, label: string, n: number) => `
+    <button class="topic${state.topic === value ? ' active' : ''}" data-topic="${value}">
+      <span>${esc(label)}</span><span class="topic-count">${n}</span>
+    </button>`;
+
+  document.getElementById('topics')!.innerHTML =
+    `<span class="topics-label">Темы</span>`
+    + item('all', 'Все темы', questions.length)
+    + topics.map((t) => item(t, TOPIC_LABEL[t], counts[t]!)).join('');
 }
 
-// ── Filter pill ───────────────────────────────────────────
+function questionHtml(q: Question) {
+  const open = openIds.has(q.id);
+  const n = q.followUps.length;
+  const count = `<span class="q-count${q.asked > 1 ? ' hot' : ''}" title="Встречался на ${q.asked} ${plural(q.asked, 'собеседовании', 'собеседованиях', 'собеседованиях')}">${q.asked}×</span>`;
+  const meta = `
+    <span class="q-meta">
+      <span>${TOPIC_LABEL[q.topic]}</span>
+      ${n ? `<span class="q-toggle">${ICON_CHEVRON}${n} ${plural(n, 'уточнение', 'уточнения', 'уточнений')}</span>` : ''}
+      <a class="q-link" href="?id=${q.id}" data-link="${q.id}">#${q.id}</a>
+    </span>`;
+  const body = `<span class="q-body"><span class="q-text">${esc(q.question)}</span>${meta}</span>`;
 
-function filterPill(label: string, value: string, count: number, active: boolean) {
-  return `<button class="filter-pill${active ? ' active' : ''}" data-value="${value}">
-    ${esc(label)}<span class="filter-count">${count}</span>
-  </button>`;
+  // Вопрос без уточнений раскрывать нечего — это просто строка
+  const row = n
+    ? `<div class="q-row" role="button" tabindex="0" data-toggle="${q.id}" aria-expanded="${open}">${count}${body}</div>`
+    : `<div class="q-row">${count}${body}</div>`;
+  const followUps = n
+    ? `<ol class="q-followups"${open ? '' : ' hidden'}>${q.followUps.map((f) => `<li>${esc(f)}</li>`).join('')}</ol>`
+    : '';
+
+  return `<article class="q${open ? ' open' : ''}" id="q-${q.id}">${row}${followUps}</article>`;
 }
-
-// ── Render list ───────────────────────────────────────────
 
 function renderList() {
-  const topicCounts: Record<string, number> = {};
-  questions.forEach((q) => {
-    topicCounts[q.topic] = (topicCounts[q.topic] ?? 0) + 1;
-  });
-
-  const filtered = sorted.filter((q) => {
-    if (state.topic !== 'all' && q.topic !== state.topic) return false;
-    if (state.q) {
-      const needle = state.q.toLowerCase();
-      return q.question.toLowerCase().includes(needle)
-        || q.followUps.some((f) => f.toLowerCase().includes(needle));
-    }
-    return true;
-  });
-
-  const topicPills = TOPICS
-    .filter((t) => t === 'all' || (topicCounts[t] ?? 0) > 0)
-    .map((t) => filterPill(
-      t === 'all' ? 'Все' : TOPIC_LABEL[t],
-      t, t === 'all' ? questions.length : (topicCounts[t] ?? 0),
-      state.topic === t,
-    )).join('');
-
-  const cards = filtered.length
-    ? filtered.map((q, i) => `
-        <button
-          class="case-card fade-in-up"
-          data-question-id="${q.id}"
-          style="animation-delay: ${Math.min(i, 20) * 0.03}s"
-        >
-          <div class="card-top">
-            <div class="card-badges">
-              ${topicBadge(q.topic)}
-              ${askedBadge(q.asked)}
-            </div>
-            <span class="card-arrow">${ICON_ARROW_UPRIGHT}</span>
-          </div>
-          <h3 class="card-title">${esc(q.question)}</h3>
-          ${q.followUps.length
-            ? `<div class="card-footer">
-                 <span class="card-q-count">${ICON_MSG} ${pluralFollowUps(q.followUps.length)}</span>
-               </div>`
-            : ''}
-        </button>`
-    ).join('')
-    : `<div class="empty-state">Ничего не найдено</div>`;
-
-  document.getElementById('question-list')!.innerHTML = cards;
-  document.getElementById('stats-bar')!.textContent =
-    `Показано ${filtered.length} из ${questions.length}`;
-  document.getElementById('topic-pills')!.innerHTML = topicPills;
-
-  bindCardEvents();
-  bindFilterEvents();
+  const filtered = sorted.filter(matches);
+  document.getElementById('list')!.innerHTML = filtered.length
+    ? filtered.map(questionHtml).join('')
+    : `<p class="empty">Ничего не найдено</p>`;
 }
 
-// ── Modal ─────────────────────────────────────────────────
+function render() {
+  renderTopics();
+  renderList();
+}
 
-function openModal(id: string, pushUrl = true) {
+// ── Actions ───────────────────────────────────────────────
+
+function toggleQuestion(id: string) {
+  if (openIds.has(id)) openIds.delete(id);
+  else openIds.add(id);
   const q = questions.find((x) => x.id === id);
-  if (!q) return;
-  openQuestionId = id;
+  const el = document.getElementById(`q-${id}`);
+  if (q && el) el.outerHTML = questionHtml(q);
+}
 
-  const followUps = q.followUps.map((f, i) => `
-    <li class="question-item">
-      <span class="question-num">${i + 1}</span>
-      <span>${esc(f)}</span>
-    </li>`).join('');
-
-  document.getElementById('modal-badges')!.innerHTML = `${topicBadge(q.topic)} ${askedBadge(q.asked)}`;
-  document.getElementById('modal-title')!.textContent = q.question;
-  document.getElementById('modal-questions')!.innerHTML = followUps;
-  document.getElementById('modal-q-label')!.textContent =
-    `Уточняющие вопросы (${q.followUps.length})`;
-
-  // Вопросы без уточнений показываем без пустой секции
-  document.getElementById('modal-body')!.hidden = q.followUps.length === 0;
-
-  if (pushUrl) {
-    const params = new URLSearchParams(location.search);
-    params.set('id', id);
-    history.pushState({ id }, '', `${location.pathname}?${params}`);
+async function copyLink(id: string, el: HTMLElement) {
+  const url = `${location.origin}${location.pathname}?id=${id}`;
+  history.replaceState(null, '', `?id=${id}`);
+  try {
+    await navigator.clipboard.writeText(url);
+    el.textContent = 'ссылка скопирована';
+    setTimeout(() => { el.textContent = `#${id}`; }, 1200);
+  } catch {
+    // Буфер обмена недоступен — ссылка всё равно уже в адресной строке
   }
-  document.title = `${q.question} — ML Interview Questions`;
-
-  document.getElementById('modal-overlay')!.classList.add('open');
-  document.body.style.overflow = 'hidden';
 }
 
-function closeModal(pushUrl = true) {
-  openQuestionId = null;
-  if (pushUrl) {
-    const params = new URLSearchParams(location.search);
-    params.delete('id');
-    const search = params.toString() ? `?${params}` : location.pathname;
-    history.pushState({}, '', search);
-  }
-  document.title = 'ML Interview Questions';
-  document.getElementById('modal-overlay')!.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// ── Bind events ───────────────────────────────────────────
-
-function bindCardEvents() {
-  document.querySelectorAll<HTMLElement>('.case-card').forEach((card) => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.questionId;
-      if (id) openModal(id);
-    });
-  });
-}
-
-function bindFilterEvents() {
-  document.querySelectorAll<HTMLElement>('.filter-pill').forEach((pill) => {
-    pill.addEventListener('click', () => {
-      state.topic = (pill.dataset.value ?? 'all') as Filter<Topic>;
-      renderList();
-    });
-  });
+function openFromUrl() {
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id || !questions.some((q) => q.id === id)) return;
+  // Иначе при перезагрузке браузер вернёт старую прокрутку поверх нашей
+  history.scrollRestoration = 'manual';
+  openIds.add(id);
+  render();
+  const el = document.getElementById(`q-${id}`);
+  el?.scrollIntoView({ block: 'center' });
+  el?.classList.add('flash');
 }
 
 // ── Bootstrap ─────────────────────────────────────────────
 
 function init() {
-  const app = document.getElementById('app')!;
-  app.innerHTML = `
-    <div class="page-wrap">
-      <main class="main">
-        <div class="container">
-
-          <div class="theme-wrap">
-            <button class="theme-btn" id="theme-btn" aria-label="Переключить тему">
-              ${isDark() ? `${ICON_SUN} Светлая` : `${ICON_MOON} Тёмная`}
-            </button>
-          </div>
-
-          <div class="hero fade-in-up">
-            <div class="hero-icon-wrap">${ICON_CHAT}</div>
-            <h1 class="hero-title">
-              <span class="hero-title-line1">ML Interview</span>
-              <span class="hero-title-line2">Questions</span>
-            </h1>
-            <p class="hero-subtitle">
-              Вопросы с реальных технических собеседований на позиции Data Scientist, NLP и LLM-инженер
-            </p>
-            <div class="authors">
-              <span class="authors-title">Автор сборника</span>
-              <div class="authors-list">
-                <div class="author-card author-card-lead">
-                  <span class="author-name">${esc(AUTHOR.name)}</span>
-                  <div class="author-links">
-                    <a class="author-btn author-btn-telegram" href="${AUTHOR.href}" target="_blank" rel="noopener noreferrer"
-                    >${ICON_SEND}<span class="author-btn-label">Telegram</span><span
-                      class="author-btn-handle">${esc(AUTHOR.handle)}</span></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="search-wrap">
-            <input
-              id="search-input"
-              class="search-input"
-              type="search"
-              placeholder="Поиск по вопросам..."
-              autocomplete="off"
-              spellcheck="false"
-            />
-          </div>
-
-          <div class="filters">
-            <div class="filter-row">
-              <span class="filter-label">Тема:</span>
-              <div id="topic-pills" style="display:contents"></div>
-            </div>
-          </div>
-
-          <p class="stats-bar" id="stats-bar"></p>
-
-          <div class="case-grid" id="question-list"></div>
-
-        </div>
-      </main>
-
-      <footer class="site-footer">
-        <div class="container">
-          <p class="footer-desc">Вопросы с реальных технических собеседований по ML, NLP и LLM</p>
-          <div class="footer-contacts">
-            <a class="footer-link" href="https://t.me/maxouniai" target="_blank" rel="noopener">
-              ${ICON_SEND}<span>Telegram-канал</span>
-            </a>
-            <a class="footer-link" href="https://aimnoux.github.io/mlsd/" target="_blank" rel="noopener">
-              ${ICON_LAYERS}<span>Кейсы по ML System Design</span>
-            </a>
-            <a class="footer-link" href="https://t.me/dgiknooor" target="_blank" rel="noopener">
-              ${ICON_SEND}<span>Написать</span>
-            </a>
-          </div>
-        </div>
-      </footer>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true">
-      <div class="modal" id="modal">
-        <div class="modal-header">
-          <div class="modal-header-top">
-            <div class="modal-badges" id="modal-badges"></div>
-            <button class="modal-close" id="modal-close" aria-label="Закрыть">✕</button>
-          </div>
-          <h2 class="modal-title" id="modal-title"></h2>
-        </div>
-        <div class="modal-body" id="modal-body">
+  document.getElementById('app')!.innerHTML = `
+    <header class="header">
+      <div class="wrap">
+        <div class="header-top">
           <div>
-            <div class="modal-section-head">
-              ${ICON_LIST}
-              <span id="modal-q-label">Уточняющие вопросы</span>
-            </div>
-            <ul class="questions-list" id="modal-questions"></ul>
+            <h1 class="title">ML Interview Questions</h1>
+            <p class="subtitle">
+              ${questions.length} ${plural(questions.length, 'вопрос', 'вопроса', 'вопросов')} с ${interviewsCount} реальных собеседований на Data Scientist, NLP и LLM-инженера.
+              Собирает <a href="https://t.me/maxouniai" target="_blank" rel="noopener">@maxouniai</a>
+            </p>
           </div>
+          <button class="theme-btn" id="theme-btn"></button>
+        </div>
+        <div class="search">
+          <input id="search" type="search" placeholder="Поиск по вопросам и уточнениям" autocomplete="off" spellcheck="false" />
+          <kbd>/</kbd>
         </div>
       </div>
+    </header>
+
+    <div class="wrap layout">
+      <nav class="topics" id="topics" aria-label="Темы"></nav>
+      <main>
+        <div class="list-head">
+          <span class="list-head-count">Раз</span>
+          <span class="list-head-q">Вопрос</span>
+        </div>
+        <div id="list"></div>
+      </main>
     </div>
+
+    <footer class="footer">
+      <div class="wrap">
+        Вопросы анонимизированы: без компаний, имён и деталей проектов.
+        Telegram-канал — <a href="https://t.me/maxouniai" target="_blank" rel="noopener">maxouni.ai</a>
+      </div>
+    </footer>
   `;
 
+  renderThemeBtn();
   document.getElementById('theme-btn')!.addEventListener('click', toggleTheme);
 
-  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  document.getElementById('topics')!.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-topic]');
+    if (!btn) return;
+    state.topic = btn.dataset.topic as Filter<Topic>;
+    render();
+    window.scrollTo({ top: 0 });
+  });
+
+  document.getElementById('list')!.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const link = target.closest<HTMLElement>('[data-link]');
+    if (link) {
+      e.preventDefault();
+      e.stopPropagation();
+      copyLink(link.dataset.link!, link);
+      return;
+    }
+    const row = target.closest<HTMLElement>('[data-toggle]');
+    if (row) toggleQuestion(row.dataset.toggle!);
+  });
+
+  // Строка вопроса — div с role="button" (внутри неё ссылка, а <a> в <button> невалиден)
+  document.getElementById('list')!.addEventListener('keydown', (e) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-toggle]');
+    if (!row || e.target !== row || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    toggleQuestion(row.dataset.toggle!);
+    document.querySelector<HTMLElement>(`[data-toggle="${row.dataset.toggle}"]`)?.focus();
+  });
+
+  const search = document.getElementById('search') as HTMLInputElement;
   let debounce: ReturnType<typeof setTimeout>;
-  searchInput.addEventListener('input', () => {
+  search.addEventListener('input', () => {
     clearTimeout(debounce);
-    debounce = setTimeout(() => {
-      state.q = searchInput.value;
-      renderList();
-    }, 180);
+    debounce = setTimeout(() => { state.q = search.value.trim(); renderList(); }, 150);
   });
 
-  document.getElementById('modal-close')!.addEventListener('click', () => closeModal());
-  document.getElementById('modal-overlay')!.addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeModal();
-  });
+  // «/» — фокус в поиск, Esc — очистить
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && openQuestionId) closeModal();
+    if (e.key === '/' && document.activeElement !== search) {
+      e.preventDefault();
+      search.focus();
+    } else if (e.key === 'Escape' && document.activeElement === search) {
+      search.value = '';
+      state.q = '';
+      renderList();
+      search.blur();
+    }
   });
 
-  window.addEventListener('popstate', () => {
-    const id = new URLSearchParams(location.search).get('id');
-    if (id) openModal(id, false);
-    else closeModal(false);
-  });
-
-  renderList();
-
-  const initialId = new URLSearchParams(location.search).get('id');
-  if (initialId) openModal(initialId, false);
+  render();
+  openFromUrl();
 }
 
 init();
