@@ -1,0 +1,167 @@
+# Таксономия тем библиотеки.
+#
+# Два уровня: раздел → тема. Роли (DS, LLM, CV, …) здесь НЕ участвуют:
+# один и тот же вопрос спрашивают на разных ролях, поэтому группировка — только по смыслу.
+#
+# Правила:
+# - id — латиница, kebab-case, стабильные (участвуют в путях и URL). title — по-русски.
+# - Вопрос лежит в content/questions/<section>/<topic>/<id>.md — раздел и тема берутся из пути.
+# - Новую тему заводим, когда в неё набирается 3+ вопроса, которые не ложатся в существующие.
+# - Переименовывать title можно свободно, id — только вместе с переносом файлов.
+
+sections:
+  - id: python
+    title: Python
+    topics:
+      - { id: core, title: Основы языка }                     # типы, изменяемость, функции, декораторы, генераторы, контекстные менеджеры
+      - { id: oop, title: ООП в Python }                       # классы, MRO, dunder-методы, дескрипторы, метаклассы
+      - { id: internals, title: Внутреннее устройство }        # модель памяти, GC, reference counting, байткод
+      - { id: concurrency, title: Конкурентность и параллелизм } # GIL, threading, multiprocessing, asyncio
+      - { id: libraries, title: NumPy, pandas и экосистема }
+
+  - id: engineering
+    title: Программная инженерия
+    topics:
+      - { id: cpp, title: C++ }
+      - { id: design, title: Проектирование кода и паттерны }
+      - { id: tooling, title: Linux, Git, тестирование }
+
+  - id: algorithms
+    title: Алгоритмы и структуры данных
+    topics:
+      - { id: complexity, title: Сложность алгоритмов }
+      - { id: arrays-strings, title: Массивы, строки, два указателя }
+      - { id: hashing, title: Хеш-таблицы }
+      - { id: trees-graphs, title: Деревья и графы }
+      - { id: dp, title: Динамическое программирование }
+      - { id: sorting-search, title: Сортировки и поиск }
+
+  - id: sql
+    title: SQL и базы данных
+    topics:
+      - { id: queries, title: Запросы и JOIN }
+      - { id: window-functions, title: Оконные функции }
+      - { id: performance, title: Индексы и производительность }
+      - { id: db-theory, title: Теория БД }                   # транзакции, ACID, нормализация, OLTP/OLAP
+
+  - id: math
+    title: Математика
+    topics:
+      - { id: linear-algebra, title: Линейная алгебра }
+      - { id: calculus, title: Матанализ }
+      - { id: optimization, title: Методы оптимизации }
+      - { id: information-theory, title: Теория информации }
+
+  - id: probability-stats
+    title: Теория вероятностей и статистика
+    topics:
+      - { id: probability, title: Теория вероятностей }
+      - { id: distributions, title: Распределения }
+      - { id: estimation, title: Оценивание параметров }
+      - { id: hypothesis-testing, title: Проверка гипотез }
+      - { id: bayesian, title: Байесовская статистика }
+      - { id: puzzles, title: Задачи и головоломки }
+
+  - id: ab-testing
+    title: A/B-тесты и продуктовая аналитика
+    topics:
+      - { id: design, title: Дизайн эксперимента }
+      - { id: metrics, title: Метрики }
+      - { id: variance-reduction, title: Снижение дисперсии }   # CUPED, стратификация
+      - { id: pitfalls, title: Подводные камни }                # peeking, SRM, множественные сравнения
+      - { id: causal-inference, title: Причинно-следственный анализ }
+
+  - id: classic-ml
+    title: Классический ML
+    topics:
+      - { id: fundamentals, title: Основы }                     # bias-variance, переобучение, валидация
+      - { id: linear-models, title: Линейные модели }
+      - { id: trees-ensembles, title: Деревья и ансамбли }
+      - { id: other-models, title: Другие модели }              # kNN, SVM, наивный Байес
+      - { id: unsupervised, title: Обучение без учителя }       # кластеризация, понижение размерности
+      - { id: metrics, title: Метрики качества }
+      - { id: feature-engineering, title: Признаки и данные }
+      - { id: interpretability, title: Интерпретируемость }
+
+  - id: deep-learning
+    title: Deep Learning
+    topics:
+      - { id: fundamentals, title: Основы нейросетей }          # backprop, активации, инициализация
+      - { id: optimization, title: Оптимизаторы и обучение }
+      - { id: regularization, title: Регуляризация и нормализация }
+      - { id: cnn, title: Свёрточные сети }
+      - { id: rnn, title: Рекуррентные сети }
+      - { id: transformers, title: Трансформеры }
+      - { id: generative, title: Генеративные модели }          # VAE, GAN, диффузия
+      - { id: scaling, title: Обучение на масштабе }            # распределённое обучение, mixed precision
+
+  - id: nlp
+    title: NLP
+    topics:
+      - { id: text-processing, title: Обработка текста и токенизация }
+      - { id: embeddings, title: Эмбеддинги }
+      - { id: classic-nlp, title: Классический NLP }
+      - { id: encoder-models, title: Encoder-модели (BERT и др.) }
+      - { id: tasks, title: Прикладные задачи }                 # классификация, NER, поиск
+
+  - id: llm
+    title: LLM
+    topics:
+      - { id: architecture, title: Архитектура современных LLM } # RoPE, GQA, MoE
+      - { id: pretraining, title: Предобучение }
+      - { id: fine-tuning, title: Дообучение }                  # SFT, LoRA/PEFT
+      - { id: alignment, title: Alignment }                     # RLHF, DPO
+      - { id: inference, title: Инференс и оптимизация }        # KV-cache, квантизация, speculative decoding
+      - { id: rag, title: RAG и поиск }
+      - { id: agents, title: Агенты и tool use }
+      - { id: prompting, title: Промптинг }
+      - { id: evaluation, title: Оценка качества }
+
+  - id: recsys
+    title: Рекомендательные системы
+    topics:
+      - { id: collaborative, title: Коллаборативная фильтрация }
+      - { id: candidate-generation, title: Генерация кандидатов }
+      - { id: ranking, title: Ранжирование }
+      - { id: metrics, title: Метрики рекомендаций }
+      - { id: production, title: Рекомендации в проде }         # cold start, feedback loops
+
+  - id: cv
+    title: Компьютерное зрение
+    topics:
+      - { id: classic-cv, title: Классическое CV }
+      - { id: classification, title: Классификация и бэкбоны }
+      - { id: detection, title: Детекция }
+      - { id: segmentation, title: Сегментация }
+      - { id: generative, title: Генерация изображений }
+      - { id: multimodal, title: Мультимодальные модели }
+
+  - id: time-series
+    title: Временные ряды
+    topics:
+      - { id: classical, title: Классические методы }
+      - { id: ml-forecasting, title: ML-прогнозирование }
+      - { id: anomaly-detection, title: Поиск аномалий }
+
+  - id: ml-system-design
+    title: ML System Design
+    topics:
+      - { id: approach, title: Подход к дизайну }
+      - { id: cases, title: Кейсы }
+
+  - id: mlops
+    title: MLOps и инфраструктура
+    topics:
+      - { id: serving, title: Деплой и сервинг }
+      - { id: monitoring, title: Мониторинг моделей }
+      - { id: pipelines, title: Пайплайны и оркестрация }
+      - { id: infra, title: Docker, Kubernetes, железо }
+      - { id: big-data, title: Big Data }                       # Spark, Hadoop, Kafka
+
+  - id: hft-quant
+    title: HFT и квант
+    topics:
+      - { id: market-microstructure, title: Микроструктура рынка }
+      - { id: quant-finance, title: Финансовая математика }
+      - { id: alpha-research, title: Поиск альфы и стратегии }
+      - { id: low-latency, title: Low latency }

@@ -1,0 +1,24 @@
+# Запись об одном обработанном собеседовании.
+# Файл: content/interviews/<YYYY>/<id>.yaml. Сырые материалы (видео, аудио, транскрипт) в репозиторий НЕ кладутся.
+
+# id = имя файла: <дата>-<роль>-<грейд>[-<n>]
+id: 2026-09-20-llm-middle
+date: 2026-09-20          # дата собеседования; если неизвестна — дата обработки
+company: null             # название компании или null, если скрываем
+role: llm                 # data-scientist | ml-engineer | ai-engineer | nlp | llm | recsys | cv | hft-quant | mlops | research | analyst | other
+grade: middle             # intern | junior | middle | senior | lead | unknown
+stage: tech               # screening | tech | live-coding | system-design | final | unknown
+source: transcript        # video | audio | transcript | list
+processed: 2026-09-25
+
+# Вопросы в порядке, в котором их задавали.
+# q — id вопроса из библиотеки; asked — дословная (или близкая) формулировка с собеса.
+# followups — уточнения, которые прозвучали в ходе обсуждения этого вопроса.
+questions:
+  - q: self-attention
+    asked: "Расскажи, как работает attention"
+    followups:
+      - q: attention-sqrt-dk-scaling
+        asked: "А зачем делить на корень из d_k?"
+  - q: lora
+    asked: "Что такое LoRA и почему она экономит память?"

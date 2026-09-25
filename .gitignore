@@ -1,0 +1,27 @@
+# Сырые материалы собеседований — никогда не коммитятся
+inbox/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.mp3
+*.m4a
+*.wav
+*.ogg
+*.flac
+*.srt
+*.vtt
+
+# Сборка сайта (сгенерированные страницы и готовый сайт)
+build/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.cache/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
