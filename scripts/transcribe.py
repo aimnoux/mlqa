@@ -92,7 +92,8 @@ def call_deepgram(audio: Path, api_key: str, multichannel: bool) -> dict:
     for attempt in range(4):
         with audio.open("rb") as f:
             r = requests.post(API_URL, params=params, headers=headers, data=f, timeout=(30, 1800))
-        if r.status_code == 429 or r.status_code >= 500:
+        # 408 SLOW_UPLOAD бывает, когда параллельные загрузки делят канал
+        if r.status_code in (408, 429) or r.status_code >= 500:
             time.sleep(5 * 2 ** attempt)
             continue
         if not r.ok:

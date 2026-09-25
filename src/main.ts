@@ -7,6 +7,8 @@ const TOPIC_LABEL: Record<Topic, string> = {
   ai_engineering: 'AI-engineering',
   deep_learning: 'Deep Learning',
   nlp: 'NLP',
+  recsys: 'RecSys',
+  cv: 'Computer Vision',
   classic_ml: 'Classic ML',
   statistics: 'Статистика',
   math: 'Математика',
@@ -168,7 +170,7 @@ function init() {
           <div>
             <h1 class="title">ML Interview Questions</h1>
             <p class="subtitle">
-              ${questions.length} ${plural(questions.length, 'вопрос', 'вопроса', 'вопросов')} с ${interviewsCount} реальных собеседований на Data Scientist, NLP и LLM-инженера.
+              ${questions.length} ${plural(questions.length, 'вопрос', 'вопроса', 'вопросов')} с ${interviewsCount} реальных собеседований на Data Scientist и ML-инженера: классический ML, NLP, LLM, статистика, алгоритмы и System Design.
               Собирает <a href="https://t.me/maxouniai" target="_blank" rel="noopener">@maxouniai</a>
             </p>
           </div>

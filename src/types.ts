@@ -3,6 +3,8 @@ export type Topic =
   | 'ai_engineering'
   | 'deep_learning'
   | 'nlp'
+  | 'recsys'
+  | 'cv'
   | 'classic_ml'
   | 'statistics'
   | 'math'
